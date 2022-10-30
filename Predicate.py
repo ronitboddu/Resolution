@@ -2,9 +2,14 @@ from Function import Function
 
 
 class Predicate:
-    __slots__ = "var_const", "functions", "neg_flag", "name"
+    __slots__ = "var_const", "functions", "neg_flag", "name", "constants_list", "predicates_list", \
+                "functions_list", "variables_list"
 
-    def __init__(self, string):
+    def __init__(self, string, constants, variables, functions, predicates):
+        self.constants_list = constants
+        self.variables_list = variables
+        self.functions_list = functions
+        self.predicates_list = predicates
         self.functions = []
         self.var_const = []
         self.neg_flag = False
@@ -25,7 +30,7 @@ class Predicate:
         ind = inner_string.strip().split(",")
         for ind_string in ind:
             if "(" in ind_string:
-                self.functions.append(Function(ind_string))
+                self.functions.append(Function(ind_string,self.constants_list,self.variables_list,self.functions_list,self.predicates_list))
             else:
                 self.var_const.append(ind_string)
 
@@ -33,12 +38,23 @@ class Predicate:
         hash1 = 0
         for func in self.functions:
             hash1 += hash(func)
-        for i in range(len(self.var_const)):
-            hash1 += hash(self.var_const[i] + str(i))
+        # for i in range(len(self.var_const)):
+        #     if self.var_const[i] in self.constants_list:
+        #         hash1 += hash(self.var_const[i] + str(i))
         return hash(self.name) + hash1
 
     def __eq__(self, other):
-        return hash(self) == hash(other)
+        if (self.hasConstant() and not other.hasConstant()) or (not self.hasConstant() and other.hasConstant()):
+            return hash(self) == hash(other)
+        else:
+            hash1, hash2 = 0, 0
+            for i in range(len(self.var_const)):
+                if self.var_const[i] in self.constants_list:
+                    hash1 += hash(self.var_const[i] + str(i))
+            for j in range(len(other.var_const)):
+                if other.var_const[j] in other.constants_list:
+                    hash2 += hash(other.var_const[j] + str(j))
+            return hash(self) + hash1 == hash(other) + hash2
 
     def __str__(self):
         var = ""
@@ -52,3 +68,56 @@ class Predicate:
         if self.neg_flag:
             var = "!" + var
         return var
+
+    def getNumVar(self):
+        var = 0
+        for func in self.functions:
+            var += func.getNumVar()
+        for v in self.var_const:
+            if v in self.variables_list:
+                var += 1
+        return var
+
+    def getNumConst(self):
+        const = 0
+        for func in self.functions:
+            const += func.getNumConst()
+        for v in self.var_const:
+            if v in self.constants_list:
+                const += 1
+        return const
+
+    def changeVar(self, map1):
+        for key in map1:
+            if key in self.var_const:
+                index = self.var_const.index(key)
+                self.var_const[index] = map1[key]
+
+    def makeConst(self, const):
+        for func in self.functions:
+            func.changeVar(const)
+        for i in range(len(self.var_const)):
+            if self.var_const[i] in self.variables_list:
+                self.var_const[i] = const
+
+    def hasConstant(self):
+        for c in self.var_const:
+            if c not in self.constants_list:
+                return False
+        return True
+
+    def hasVariable(self):
+        for v in self.var_const:
+            if v in self.variables_list:
+                return True
+        return False
+
+    def getConst(self):
+        const_list = []
+        for c in self.var_const:
+            if c in self.constants_list:
+                const_list.append(c)
+        return const_list
+
+    def getVarConst(self):
+        return self.var_const
