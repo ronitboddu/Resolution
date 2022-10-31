@@ -1,7 +1,7 @@
-Predicates: wet sprinkler dry rain bright night clear day 
-Variables: 
-Constants: 
-Functions: 
-Clauses: 
-!dry
-dry
+Predicates: angry friendly person animal loves dog man 
+Variables: x3 x0 x4 x5 x1 x2 
+Constants: SK0 Mike Kim 
+Functions: SKF0 
+Clauses:
+loves(Kim,SKF0(Kim)) 
+!loves(x5,Kim) 

@@ -61,6 +61,7 @@ class KnowledgeBase:
             for j in range(len(clause2.predicate)):
                 if clause1.predicate[i] == clause2.predicate[j] and \
                         clause1.predicate[i].neg_flag != clause2.predicate[j].neg_flag:
+                    # print("here")
                     self.checkConditions(clause1, clause2, clause1.predicate[i], clause2.predicate[j])
                     pred_lst = clause1.predicate[:i] + clause1.predicate[i + 1:] \
                                + clause2.predicate[:j] + clause2.predicate[j + 1:]
@@ -68,12 +69,14 @@ class KnowledgeBase:
                         new_clause = Clauses(self.constants, self.variables, self.functions, self.predicates)
                         new_clause.addPredicates(pred_lst)
                         ans.append(new_clause)
-                        # print(new_clause)
+                        print(new_clause)
                     flag = True
         return ans, flag
 
     def checkConditions(self, clause1, clause2, pred1, pred2):
-        if self.variables and not self.constants:
+        # if self.variables and not self.constants:
+        # print(pred1,pred2)
+        if pred1.hasVariable() and pred2.hasVariable():
             clause1.makeConst("newVar")
             clause2.makeConst("newVar")
         elif self.variables and self.constants:
@@ -94,6 +97,6 @@ class KnowledgeBase:
 
 if __name__ == '__main__':
     k = KnowledgeBase("D:\\RIT\\sem2\\AI\\Lab2\\testcases(1)\\testcases\\functions\\f2.cnf")
-    # k = KnowledgeBase("test.txt")
+    #k = KnowledgeBase("test.txt")
     temp = k.process(k.clauses)
     print('yes' if temp else 'no')

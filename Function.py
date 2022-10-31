@@ -14,9 +14,12 @@ class Function:
             string = string[1:]
         index = string.find("(")
         if index != -1:
-            self.name = string[:index + 1]
+            self.name = string[:index]
+            #print(string)
             inner_string = string[index + 1:-1]
+            #print(inner_string)
             self.variables = inner_string.strip().split(",")
+            #print(self.variables)
         else:
             self.name = None
 
@@ -38,10 +41,16 @@ class Function:
     def getNumVar(self):
         return len(self.variables)
 
-    def changeVar(self,const):
+    def makeConst(self,const):
         for i in range(len(self.variables)):
             if self.variables[i] in self.variables_list:
                 self.variables[i] = const
+
+    def changeVar(self,key,val):
+        if key in self.variables:
+            index = self.variables.index(key)
+            self.variables[index] = val
+
 
     def getNumConst(self):
         const=0
@@ -50,3 +59,21 @@ class Function:
                 const+=1
         return const
 
+    def hasVariable(self):
+        for v in self.variables:
+            if v in self.variables_list:
+                return True
+        return False
+
+    def allConst(self):
+        for v in self.variables:
+            if v not in self.constants_list:
+                return False
+        return True
+
+    def hasConstant(self):
+        for v in self.variables:
+            if v not in self.constants_list:
+                #print(v)
+                return False
+        return True

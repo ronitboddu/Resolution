@@ -30,21 +30,27 @@ class Predicate:
         ind = inner_string.strip().split(",")
         for ind_string in ind:
             if "(" in ind_string:
-                self.functions.append(Function(ind_string,self.constants_list,self.variables_list,self.functions_list,self.predicates_list))
+                self.functions.append(
+                    Function(ind_string, self.constants_list, self.variables_list, self.functions_list,
+                             self.predicates_list))
             else:
                 self.var_const.append(ind_string)
 
     def __hash__(self):
         hash1 = 0
-        for func in self.functions:
-            hash1 += hash(func)
+        # for func in self.functions:
+        #     hash1 += hash(func)
         # for i in range(len(self.var_const)):
         #     if self.var_const[i] in self.constants_list:
         #         hash1 += hash(self.var_const[i] + str(i))
         return hash(self.name) + hash1
 
     def __eq__(self, other):
+        #print(self,other)
+        #print(self,self.hasConstant())
+        #print(self.var_const)
         if (self.hasConstant() and not other.hasConstant()) or (not self.hasConstant() and other.hasConstant()):
+            #print(hash(self),hash(other))
             return hash(self) == hash(other)
         else:
             hash1, hash2 = 0, 0
@@ -59,7 +65,7 @@ class Predicate:
     def __str__(self):
         var = ""
         for v in self.var_const:
-            var += v + ","
+            var += str(v) + ","
         for func in self.functions:
             var += str(func) + ","
         if var != "":
@@ -92,24 +98,33 @@ class Predicate:
             if key in self.var_const:
                 index = self.var_const.index(key)
                 self.var_const[index] = map1[key]
+            for func in self.functions:
+                func.changeVar(key, map1[key])
 
     def makeConst(self, const):
         for func in self.functions:
-            func.changeVar(const)
+            func.makeConst(const)
         for i in range(len(self.var_const)):
             if self.var_const[i] in self.variables_list:
                 self.var_const[i] = const
 
     def hasConstant(self):
+        #print(self.var_const)
         for c in self.var_const:
             if c not in self.constants_list:
+                #print(c in self.constants_list)
                 return False
+        for func in self.functions:
+            #print("in func")
+            return func.hasConstant()
         return True
 
     def hasVariable(self):
         for v in self.var_const:
             if v in self.variables_list:
                 return True
+        for func in self.functions:
+            return func.hasVariable()
         return False
 
     def getConst(self):
@@ -120,4 +135,12 @@ class Predicate:
         return const_list
 
     def getVarConst(self):
-        return self.var_const
+        return self.var_const + self.functions
+
+    def allConst(self):
+        for v in self.var_const:
+            if v not in self.constants_list:
+                return False
+        for func in self.functions:
+            return func.allConst()
+        return True
